@@ -11,7 +11,7 @@ public abstract class ExceptionSafeTask implements Runnable {
 			task();
 		}
 		catch (Exception ex) {
-			Log.e(this.toString(), ex.toString());
+			Log.e(this.getClass().getName(), ex.toString());
 			MainActivity.makeToast(ex.toString());
 		}
 	}
