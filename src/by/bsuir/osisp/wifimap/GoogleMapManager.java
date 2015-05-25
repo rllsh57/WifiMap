@@ -54,7 +54,8 @@ public class GoogleMapManager {
 		mClusterManager.clearItems();
 		for (WifiNetwork network: networks) {
 			mClusterManager.addItem(network);
-		}	
+		}
+		mClusterManager.cluster();
 	}
 	
 	

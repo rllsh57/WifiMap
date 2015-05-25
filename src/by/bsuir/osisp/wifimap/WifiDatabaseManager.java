@@ -11,7 +11,6 @@ import com.j256.ormlite.jdbc.JdbcConnectionSource;
 
 public class WifiDatabaseManager {
 	
-	private static final String DATABASE_URL = "jdbc:mysql://192.168.100.2:3306/test_wifi_map";
 	private static final String DATABASE_LOGIN = "rllsh57";
 	private static final String DATABASE_PASS = "107295";
 	
