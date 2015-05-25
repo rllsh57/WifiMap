@@ -10,8 +10,6 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.widget.Toast;
 
-import com.google.android.gms.maps.MapFragment;
-
 
 public class MainActivity extends Activity {
 
@@ -45,7 +43,7 @@ public class MainActivity extends Activity {
     	super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-    	mMapManager = new GoogleMapManager((MapFragment)getFragmentManager().findFragmentById(R.id.map));
+    	mMapManager = new GoogleMapManager(this);
     	mDbManager = new WifiDatabaseManager(mMapManager);
     }
     
