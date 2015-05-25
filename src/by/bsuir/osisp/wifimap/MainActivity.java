@@ -1,7 +1,5 @@
 package by.bsuir.osisp.wifimap;
 
-import java.util.List;
-
 import android.app.Activity;
 import android.os.Bundle;
 import android.view.Menu;
@@ -9,18 +7,14 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.widget.Toast;
 
-import com.google.android.gms.maps.CameraUpdateFactory;
-import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapFragment;
-import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.MarkerOptions;
 
 
 public class MainActivity extends Activity {
 
 	private static MainActivity mInstance;
-	private GoogleMap mMap;
-	private WifiDatabaseManager mDbManager = new WifiDatabaseManager();
+	private GoogleMapManager mMapManager;
+	private WifiDatabaseManager mDbManager;
 	
 	
     public static void makeToast(final String text) {
@@ -33,18 +27,20 @@ public class MainActivity extends Activity {
     }
     
     
+	public static void runTask(Runnable task) {
+		mInstance.runOnUiThread(task);
+	}
+    
+    
     @Override
     public void onCreate(Bundle savedInstanceState) {
     	mInstance = this;
-        super.onCreate(savedInstanceState);
+
+    	super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        
-        mMap = ((MapFragment)getFragmentManager().findFragmentById(R.id.map)).getMap();
-        mMap.setIndoorEnabled(true);
-        mMap.setMyLocationEnabled(true);
-        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(
-                new LatLng(53.901152, 27.553153), 18));
-        
+
+    	mMapManager = new GoogleMapManager((MapFragment)getFragmentManager().findFragmentById(R.id.map));
+    	mDbManager = new WifiDatabaseManager(mMapManager);
     }
     
     
@@ -73,20 +69,5 @@ public class MainActivity extends Activity {
         mDbManager.queryWifiNetworks();
         mDbManager.disconnectFromDatabase();    	
     }
-
-
-	public static void displayWifiNetworks(final List<WifiNetwork> networks) {
-		mInstance.runOnUiThread(new Runnable() {
-			@Override
-			public void run() {
-				for (WifiNetwork network: networks) {
-					MarkerOptions marker = new MarkerOptions()
-							.position(new LatLng(network.getLattitude(), network.getLongitude())
-					);
-					mInstance.mMap.addMarker(marker);
-				}				
-			}
-		});
-	}
 }
 

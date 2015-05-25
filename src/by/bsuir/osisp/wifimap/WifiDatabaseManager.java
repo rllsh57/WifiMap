@@ -18,6 +18,7 @@ public class WifiDatabaseManager {
 	private JdbcConnectionSource mConnectionSource;
 	private Dao<WifiNetwork, Integer> mDataAccessObject;
 	private Executor mExecutor = Executors.newSingleThreadExecutor();
+	private GoogleMapManager mMapManager;
 
 	
 	private Runnable mConnectTask = new ExceptionSafeTask() {
@@ -37,11 +38,16 @@ public class WifiDatabaseManager {
 		@Override
 		protected void task() throws Exception {
 			List<WifiNetwork> networks = mDataAccessObject.queryForAll();
-			MainActivity.displayWifiNetworks(networks);
+			mMapManager.displayNetworks(networks);
 		}
 	};
 
 	
+	public WifiDatabaseManager(GoogleMapManager mapManager) {
+		mMapManager = mapManager;
+	}
+
+
 	public void connectToDatabase() {
 		mExecutor.execute(mConnectTask);
 	}
