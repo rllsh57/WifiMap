@@ -1,7 +1,10 @@
 package by.bsuir.osisp.wifimap;
 
 import android.app.Activity;
+import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -11,6 +14,8 @@ import com.google.android.gms.maps.MapFragment;
 
 
 public class MainActivity extends Activity {
+
+	public static SharedPreferences sharedPrefences;
 
 	private static MainActivity mInstance;
 	private GoogleMapManager mMapManager;
@@ -35,7 +40,8 @@ public class MainActivity extends Activity {
     @Override
     public void onCreate(Bundle savedInstanceState) {
     	mInstance = this;
-
+		sharedPrefences = PreferenceManager.getDefaultSharedPreferences(this);
+    	
     	super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
@@ -56,18 +62,17 @@ public class MainActivity extends Activity {
 	public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
         	case R.id.show_wifi:
-        		showWifiNetworks();
-        		return false;
+                mDbManager.connectToDatabase();
+                mDbManager.queryWifiNetworks();
+                mDbManager.disconnectFromDatabase();   
+        		return true;
+        	case R.id.settings:
+        		Intent intent = new Intent(this, SettingsActivity.class);
+        		startActivity(intent);
+        		return true;
             default:
                 return super.onOptionsItemSelected(item);
         }
-    }
-    
-    
-    private void showWifiNetworks() {
-        mDbManager.connectToDatabase();
-        mDbManager.queryWifiNetworks();
-        mDbManager.disconnectFromDatabase();    	
     }
 }
 

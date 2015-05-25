@@ -24,7 +24,10 @@ public class WifiDatabaseManager {
 	private Runnable mConnectTask = new ExceptionSafeTask() {
 		@Override
 		protected void task() throws Exception {
-			mConnectionSource = new JdbcConnectionSource(DATABASE_URL, DATABASE_LOGIN, DATABASE_PASS);
+			String url = "jdbc:mysql://"
+					+ MainActivity.sharedPrefences.getString(SettingsActivity.KEY_PREF_DATABASE_SERVER, "")
+					+ "/test_wifi_map";
+			mConnectionSource = new JdbcConnectionSource(url, DATABASE_LOGIN, DATABASE_PASS);
 			mDataAccessObject = DaoManager.createDao(mConnectionSource, WifiNetwork.class);
 		}
 	};
