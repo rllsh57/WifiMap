@@ -1,5 +1,7 @@
 package by.bsuir.osisp.wifimap;
 
+import java.util.List;
+
 import android.app.Activity;
 import android.os.Bundle;
 import android.view.Menu;
@@ -11,6 +13,7 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapFragment;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.MarkerOptions;
 
 
 public class MainActivity extends Activity {
@@ -18,7 +21,7 @@ public class MainActivity extends Activity {
 	private static MainActivity mInstance;
 	private GoogleMap mMap;
 	private WifiDatabaseManager mDbManager = new WifiDatabaseManager();
-    
+	
 	
     public static void makeToast(final String text) {
     	mInstance.runOnUiThread(new Runnable() {
@@ -27,11 +30,6 @@ public class MainActivity extends Activity {
         		Toast.makeText(mInstance, text, Toast.LENGTH_LONG).show();    			
     		}
     	});
-    }
-    
-    
-    public static void runTask(Runnable task) {
-    	mInstance.runOnUiThread(task);
     }
     
     
@@ -45,7 +43,7 @@ public class MainActivity extends Activity {
         mMap.setIndoorEnabled(true);
         mMap.setMyLocationEnabled(true);
         mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(
-                new LatLng(-33.86997, 151.2089), 18));
+                new LatLng(53.901152, 27.553153), 18));
         
     }
     
@@ -72,7 +70,23 @@ public class MainActivity extends Activity {
     
     private void showWifiNetworks() {
         mDbManager.connectToDatabase();
+        mDbManager.queryWifiNetworks();
         mDbManager.disconnectFromDatabase();    	
     }
+
+
+	public static void displayWifiNetworks(final List<WifiNetwork> networks) {
+		mInstance.runOnUiThread(new Runnable() {
+			@Override
+			public void run() {
+				for (WifiNetwork network: networks) {
+					MarkerOptions marker = new MarkerOptions()
+							.position(new LatLng(network.getLattitude(), network.getLongitude())
+					);
+					mInstance.mMap.addMarker(marker);
+				}				
+			}
+		});
+	}
 }
 

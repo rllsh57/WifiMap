@@ -1,5 +1,6 @@
 package by.bsuir.osisp.wifimap;
 
+import java.util.List;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 
@@ -16,7 +17,7 @@ public class WifiDatabaseManager {
 	
 	private JdbcConnectionSource mConnectionSource;
 	private Dao<WifiNetwork, Integer> mDataAccessObject;
-	private Executor mExecutor = Executors.newFixedThreadPool(1);
+	private Executor mExecutor = Executors.newSingleThreadExecutor();
 
 	
 	private Runnable mConnectTask = new ExceptionSafeTask() {
@@ -24,7 +25,6 @@ public class WifiDatabaseManager {
 		protected void task() throws Exception {
 			mConnectionSource = new JdbcConnectionSource(DATABASE_URL, DATABASE_LOGIN, DATABASE_PASS);
 			mDataAccessObject = DaoManager.createDao(mConnectionSource, WifiNetwork.class);
-			MainActivity.makeToast("count = " + mDataAccessObject.queryForAll().size());
 		}
 	};
 	private Runnable mDisconnectTask = new ExceptionSafeTask() {
@@ -33,7 +33,14 @@ public class WifiDatabaseManager {
 			mConnectionSource.close();
 		}
 	};
-	
+	private Runnable mQueryTask = new ExceptionSafeTask() {
+		@Override
+		protected void task() throws Exception {
+			List<WifiNetwork> networks = mDataAccessObject.queryForAll();
+			MainActivity.displayWifiNetworks(networks);
+		}
+	};
+
 	
 	public void connectToDatabase() {
 		mExecutor.execute(mConnectTask);
@@ -42,5 +49,10 @@ public class WifiDatabaseManager {
 	
 	public void disconnectFromDatabase() {
 		mExecutor.execute(mDisconnectTask);
+	}
+	
+	
+	public void queryWifiNetworks() {
+		mExecutor.execute(mQueryTask);
 	}
 }
