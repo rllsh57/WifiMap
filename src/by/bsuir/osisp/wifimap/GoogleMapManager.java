@@ -8,6 +8,7 @@ import android.content.Context;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.maps.android.clustering.ClusterManager;
@@ -30,7 +31,14 @@ public class GoogleMapManager {
             markerOptions
             		.title(network.getSsid())
             		.snippet(network.getPassword());
-        }
+            if (network.getPassword() == null) {
+           		markerOptions.icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_wifi_signal_4_light));
+            }
+            else {
+           		markerOptions.icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_wifi_lock_signal_4_light));            	
+            }
+
+		}
 	};
 	
 	
