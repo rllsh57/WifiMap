@@ -8,6 +8,7 @@ import android.content.Context;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptor;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
@@ -22,22 +23,22 @@ public class GoogleMapManager {
 
 	
 	private class WifiNetworkRenderer extends DefaultClusterRenderer<WifiNetwork> {
+
+		private final BitmapDescriptor mWifiOpenIcon = BitmapDescriptorFactory.fromResource(R.drawable.ic_wifi_signal_4_light);
+		private final BitmapDescriptor mWifiSecureIcon = BitmapDescriptorFactory.fromResource(R.drawable.ic_wifi_lock_signal_4_light);
+		
         public WifiNetworkRenderer(Context context, GoogleMap map, ClusterManager<WifiNetwork> clusterManager) {
 			super(context, map, clusterManager);
 		}
 
 		@Override
         protected void onBeforeClusterItemRendered(WifiNetwork network, MarkerOptions markerOptions) {
-            markerOptions
-            		.title(network.getSsid())
-            		.snippet(network.getPassword());
-            if (network.getPassword() == null) {
-           		markerOptions.icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_wifi_signal_4_light));
-            }
-            else {
-           		markerOptions.icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_wifi_lock_signal_4_light));            	
-            }
-
+            markerOptions.title(network.getSsid())
+                         .snippet(network.getPassword());
+            if (network.getPassword() == null) 
+            	markerOptions.icon(mWifiOpenIcon);
+            else 
+           		markerOptions.icon(mWifiSecureIcon);            	
 		}
 	};
 	
