@@ -1,7 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-
     <string name="app_name">Wifi Map</string>
-    <string name="hello_world">Hello world!</string>
-
+	<string name="database_server">Database Server</string>
+	<string name="database_server_summary">IP or domain name of wifi database server</string>
+	<string name="theme">Theme</string>
+	<string name="theme_summary">Dark or light theme</string>
+ 	<string-array name="theme_entries">
+	    <item>Dark</item>
+	    <item>Light</item>    
+	</string-array>
+	<string-array name="theme_values">
+ 	    <item>16974120</item>
+	    <item>16974123</item>
+   	</string-array>
 </resources>
