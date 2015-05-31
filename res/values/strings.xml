@@ -10,7 +10,8 @@
 	    <item>Light</item>    
 	</string-array>
 	<string-array name="theme_values">
- 	    <item>16974120</item>
-	    <item>16974123</item>
+ 	    <item>16973931</item>
+	    <item>16973934</item>
    	</string-array>
+   	<string name="favorite">Favorite</string>
 </resources>

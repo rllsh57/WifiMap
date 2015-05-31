@@ -1,14 +1,20 @@
 package by.bsuir.osisp.wifimap;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.support.v4.app.ActionBarDrawerToggle;
+import android.support.v4.widget.DrawerLayout;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.ArrayAdapter;
+import android.widget.ListView;
 import android.widget.Toast;
 
 
@@ -16,8 +22,13 @@ public class MainActivity extends Activity implements OnSharedPreferenceChangeLi
 
 	private static MainActivity mInstance;
 	private SharedPreferences mSharedPrefences;
+	
+	private DrawerLayout mDrawerLayout;
+	private ActionBarDrawerToggle mDrawerToggle;
+	
 	private GoogleMapManager mMapManager;
 	private WifiDatabaseManager mDbManager;
+	private FavoriteNetworksManager mFavNetManager;
 		
 	
     public static void makeToast(final String text) {
@@ -42,7 +53,34 @@ public class MainActivity extends Activity implements OnSharedPreferenceChangeLi
 	}
 	
 	
-    @Override
+	public void setActivityTheme(int resid) {
+		// Тема должна быть установлена до setContentView() иначе установится плохо
+		setTheme(resid);
+		setContentView(R.layout.activity_main);
+		// findViewById() должен быть вызван после setContentView() иначе NullPointerException
+		ListView mDrawerList = (ListView) findViewById(R.id.left_drawer);
+		if (resid == android.R.style.Theme_Holo_Light)
+			mDrawerList.setBackgroundResource(R.drawable.background_holo_light);
+		else if (resid == android.R.style.Theme_Holo)
+			mDrawerList.setBackgroundResource(R.drawable.background_holo_dark);			
+	}
+	
+	
+	protected void setupFavoritesDrawer() {		
+		mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);		
+        getActionBar().setDisplayHomeAsUpEnabled(true);
+        getActionBar().setTitle(R.string.favorite);
+        mDrawerToggle = new ActionBarDrawerToggle(
+				this,
+				mDrawerLayout,
+				R.drawable.ic_drawer,
+				R.string.favorite,
+				R.string.favorite);
+	}
+	
+	
+	@SuppressLint("NewApi")
+	@Override
     public void onCreate(Bundle savedInstanceState) {
     	mInstance = this;
 
@@ -50,11 +88,12 @@ public class MainActivity extends Activity implements OnSharedPreferenceChangeLi
     	mSharedPrefences.registerOnSharedPreferenceChangeListener(this);
 
     	super.onCreate(savedInstanceState);
-		setTheme(Integer.valueOf(mSharedPrefences.getString(SettingsActivity.KEY_PREF_THEME, "")));
-    	setContentView(R.layout.activity_main);
+		setActivityTheme(Integer.valueOf(mSharedPrefences.getString(SettingsActivity.KEY_PREF_THEME, "")));
+		setupFavoritesDrawer();
 
     	mMapManager = new GoogleMapManager(this);
     	mDbManager = new WifiDatabaseManager(mMapManager);
+    	mFavNetManager = new FavoriteNetworksManager((ListView) findViewById(R.id.left_drawer));
     }
     
     
@@ -62,12 +101,16 @@ public class MainActivity extends Activity implements OnSharedPreferenceChangeLi
 	public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.menu, menu);
-        return true;
+        return super.onCreateOptionsMenu(menu);
     }
     
     
     @Override
 	public boolean onOptionsItemSelected(MenuItem item) {
+        if (mDrawerToggle.onOptionsItemSelected(item)) {
+            return true;
+        }
+    	
         switch (item.getItemId()) {
         	case R.id.show_wifi:
                 mDbManager.connectToDatabase();
