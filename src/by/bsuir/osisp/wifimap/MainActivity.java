@@ -1,5 +1,8 @@
 package by.bsuir.osisp.wifimap;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Intent;
@@ -13,17 +16,20 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.ArrayAdapter;
+import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ListView;
 import android.widget.Toast;
 
 
-public class MainActivity extends Activity implements OnSharedPreferenceChangeListener {
+@SuppressWarnings("deprecation")
+public class MainActivity extends Activity implements OnSharedPreferenceChangeListener, OnItemClickListener {
 
-	private static MainActivity mInstance;
+	public static MainActivity mInstance;
 	private SharedPreferences mSharedPrefences;
 	
 	private DrawerLayout mDrawerLayout;
+	private ListView mDrawerList;
 	private ActionBarDrawerToggle mDrawerToggle;
 	
 	private GoogleMapManager mMapManager;
@@ -62,11 +68,12 @@ public class MainActivity extends Activity implements OnSharedPreferenceChangeLi
 		if (resid == android.R.style.Theme_Holo_Light)
 			mDrawerList.setBackgroundResource(R.drawable.background_holo_light);
 		else if (resid == android.R.style.Theme_Holo)
-			mDrawerList.setBackgroundResource(R.drawable.background_holo_dark);			
+			mDrawerList.setBackgroundResource(R.drawable.background_holo_dark);	
 	}
 	
 	
-	protected void setupFavoritesDrawer() {		
+	protected void setupFavoritesDrawer() {	
+		mDrawerList = (ListView) findViewById(R.id.left_drawer);
 		mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);		
         getActionBar().setDisplayHomeAsUpEnabled(true);
         getActionBar().setTitle(R.string.favorite);
@@ -93,7 +100,9 @@ public class MainActivity extends Activity implements OnSharedPreferenceChangeLi
 
     	mMapManager = new GoogleMapManager(this);
     	mDbManager = new WifiDatabaseManager(mMapManager);
-    	mFavNetManager = new FavoriteNetworksManager((ListView) findViewById(R.id.left_drawer));
+    	mFavNetManager = new FavoriteNetworksManager((ListView) findViewById(R.id.left_drawer), mMapManager);
+    	
+    	mDrawerList.setOnItemClickListener(this);
     }
     
     
@@ -113,9 +122,15 @@ public class MainActivity extends Activity implements OnSharedPreferenceChangeLi
     	
         switch (item.getItemId()) {
         	case R.id.show_wifi:
-                mDbManager.connectToDatabase();
-                mDbManager.queryWifiNetworks();
-                mDbManager.disconnectFromDatabase();   
+        		List<WifiNetwork> nets = new ArrayList<WifiNetwork>();
+        		nets.add(new WifiNetwork().setSsid("rllsh57").setLatLng(53.903137, 27.557007));
+        		nets.add(new WifiNetwork().setSsid("ArtMaster").setLatLng(53.902671, 27.556845));
+        		mFavNetManager.addNetwork(nets.get(0));
+        		mFavNetManager.addNetwork(nets.get(1));
+        		mMapManager.displayNetworks(nets);
+//                mDbManager.connectToDatabase();
+//                mDbManager.queryWifiNetworks();
+//                mDbManager.disconnectFromDatabase();   
         		return true;
         	case R.id.settings:
         		Intent intent = new Intent(this, SettingsActivity.class);
@@ -125,5 +140,13 @@ public class MainActivity extends Activity implements OnSharedPreferenceChangeLi
                 return super.onOptionsItemSelected(item);
         }
     }
+    
+    
+	@Override
+    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+		WifiNetwork item = mFavNetManager.getItem(position);
+		mMapManager.moveCamera(item.getPosition());
+		mDrawerLayout.closeDrawers();
+	}
 }
 

@@ -76,4 +76,9 @@ public class GoogleMapManager {
 			}
 		});
 	}
+	
+	
+	public void moveCamera(LatLng position) {
+		mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(position, 18));
+	}
 }

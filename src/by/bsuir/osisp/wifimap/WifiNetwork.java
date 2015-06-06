@@ -36,6 +36,12 @@ public class WifiNetwork implements ClusterItem {
 	}
 	
 	
+	public WifiNetwork setSsid(String ssid) {
+		ap_ssid = ssid;
+		return this;
+	}
+	
+	
 	public String getPassword() {
 		return ap_password;
 	}
@@ -54,5 +60,17 @@ public class WifiNetwork implements ClusterItem {
 	@Override
 	public LatLng getPosition() {
 		return new LatLng(ap_lattitude, ap_longiture);
+	}
+	
+	
+	public String toString() {
+		return ap_ssid;
+	}
+
+
+	public WifiNetwork setLatLng(double lattitude, double longitude) {
+		ap_lattitude = lattitude;
+		ap_longiture = longitude;
+		return this;
 	}
 }
