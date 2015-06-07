@@ -2,6 +2,10 @@ package by.bsuir.osisp.wifimap;
 
 import java.io.Serializable;
 
+import android.content.Context;
+import android.net.wifi.WifiConfiguration;
+import android.net.wifi.WifiManager;
+
 import com.google.android.gms.maps.model.LatLng;
 import com.google.maps.android.clustering.ClusterItem;
 import com.j256.ormlite.field.DatabaseField;
@@ -88,5 +92,32 @@ public class WifiNetwork implements ClusterItem, Serializable {
 
 	public void setRange(double range) {
 		ap_range = range;
+	}
+
+
+	public void connectTo() {
+		WifiManager wifi_manager = (WifiManager) MainActivity.mInstance.getSystemService(Context.WIFI_SERVICE);
+		if (wifi_manager == null) {
+			MainActivity.makeToast("WifiManager service unavailable");
+			return;
+		}
+
+		WifiConfiguration config = new WifiConfiguration();
+		config.SSID = "\"" + ap_ssid + "\"";
+		if (ap_password == null) 
+			config.allowedKeyManagement.set(WifiConfiguration.KeyMgmt.NONE);
+		else {
+			config.allowedKeyManagement.set(WifiConfiguration.KeyMgmt.WPA_PSK);
+			config.preSharedKey = "\"" + ap_password + "\"";
+		}
+		
+		int id = wifi_manager.addNetwork(config);
+		if (id == -1) {
+			MainActivity.makeToast("Network not added");
+			return;
+		}
+		MainActivity.makeToast(wifi_manager.getConfiguredNetworks().size()+"");
+		
+		wifi_manager.enableNetwork(id, true);
 	}
 }

@@ -15,6 +15,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
+import android.widget.AdapterView.OnItemLongClickListener;
 import android.widget.ListView;
 import android.widget.Toast;
 
@@ -22,7 +23,8 @@ import android.widget.Toast;
 @SuppressWarnings("deprecation")
 public class MainActivity extends Activity implements 
 					OnSharedPreferenceChangeListener, 
-					OnItemClickListener {
+					OnItemClickListener,
+					OnItemLongClickListener {
 
 	public static MainActivity mInstance;
 	private SharedPreferences mSharedPrefences;
@@ -102,6 +104,7 @@ public class MainActivity extends Activity implements
     	mFavNetManager = new FavoriteNetworksManager((ListView) findViewById(R.id.left_drawer), mMapManager);
     	
     	mDrawerList.setOnItemClickListener(this);
+    	mDrawerList.setOnItemLongClickListener(this);
 
 		mFavNetManager.load();
         mDbManager.connectToDatabase();
@@ -127,6 +130,7 @@ public class MainActivity extends Activity implements
     
     @Override public boolean onPrepareOptionsMenu(Menu menu) {
         menu.findItem(R.id.add_to_favorite).setVisible(mMapManager.isInfoWindowVisible());
+        menu.findItem(R.id.connect_to).setVisible(mMapManager.isInfoWindowVisible());
     	return super.onPrepareOptionsMenu(menu);
     };
     
@@ -137,11 +141,18 @@ public class MainActivity extends Activity implements
             return true;
         }
     	
+        WifiNetwork selectedNetwork;
+        
         switch (item.getItemId()) {
         	case R.id.add_to_favorite:
-        		WifiNetwork selectedNetwork = mMapManager.getSelectedNetwork();
+        		selectedNetwork = mMapManager.getSelectedNetwork();
         		if (selectedNetwork != null)
         			mFavNetManager.addNetwork(selectedNetwork);
+        		return true;
+        	case R.id.connect_to:
+        		selectedNetwork = mMapManager.getSelectedNetwork();
+        		if (selectedNetwork != null)
+        			selectedNetwork.connectTo();
         		return true;
         	case R.id.settings:
         		Intent intent = new Intent(this, SettingsActivity.class);
@@ -158,6 +169,13 @@ public class MainActivity extends Activity implements
 		WifiNetwork item = mFavNetManager.getItem(position);
 		mMapManager.moveCamera(item.getPosition());
 		mDrawerLayout.closeDrawers();
+	}
+
+
+	@Override
+	public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
+		mFavNetManager.remove(position);
+		return false;
 	}
 }
 
