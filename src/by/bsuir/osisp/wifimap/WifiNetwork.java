@@ -23,6 +23,8 @@ public class WifiNetwork implements ClusterItem, Serializable {
 	private double ap_lattitude;
 	@DatabaseField
 	private double ap_longiture;
+	@DatabaseField
+	private double ap_range;
 	
 	
 	public WifiNetwork() {
@@ -76,5 +78,15 @@ public class WifiNetwork implements ClusterItem, Serializable {
 		ap_lattitude = lattitude;
 		ap_longiture = longitude;
 		return this;
+	}
+
+
+	public double getRange() {
+		return ap_range;
+	}
+
+
+	public void setRange(double range) {
+		ap_range = range;
 	}
 }

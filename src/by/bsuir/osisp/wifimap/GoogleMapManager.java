@@ -4,14 +4,19 @@ import java.util.List;
 
 import android.app.Activity;
 import android.content.Context;
+import android.graphics.Color;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.GoogleMap.OnMapClickListener;
+import com.google.android.gms.maps.GoogleMap.OnMarkerClickListener;
 import com.google.android.gms.maps.MapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptor;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
+import com.google.android.gms.maps.model.Circle;
+import com.google.android.gms.maps.model.CircleOptions;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.maps.android.clustering.Cluster;
 import com.google.maps.android.clustering.ClusterManager;
@@ -24,8 +29,11 @@ public class GoogleMapManager {
 	
 	private GoogleMap mMap;
 	private ClusterManager<WifiNetwork> mClusterManager;
-	private WifiNetwork mSelectedNetwork;
 	private InfoWindowSpecarator mSpecarator = new InfoWindowSpecarator();
+
+	private WifiNetwork mSelectedNetwork;
+	private Circle mCircle;
+	private Marker mMarker;
 
 	private class WifiNetworkRenderer extends DefaultClusterRenderer<WifiNetwork> {
 
@@ -39,11 +47,12 @@ public class GoogleMapManager {
 		@Override
         protected void onBeforeClusterItemRendered(WifiNetwork network, MarkerOptions markerOptions) {
             markerOptions.title(network.getSsid())
-                         .snippet(network.getPassword());
+                         .snippet(network.getPassword())
+                         .anchor(0.5f, 0.5f);
             if (network.getPassword() == null) 
             	markerOptions.icon(mWifiOpenIcon);
             else 
-           		markerOptions.icon(mWifiSecureIcon);            	
+           		markerOptions.icon(mWifiSecureIcon);
 		}
 		
         @Override
@@ -51,7 +60,7 @@ public class GoogleMapManager {
             // При перерисовке кластера, infoWindow закрывается. Сдесь отслеживается это.
             boolean should = super.shouldRenderAsCluster(cluster);
             if (cluster.getItems().contains((Object) mSelectedNetwork) && should)
-            	mSelectedNetwork = null;
+            	onInfoWindowHide();
             return should;
         }
 	};
@@ -59,19 +68,25 @@ public class GoogleMapManager {
 	private class InfoWindowSpecarator implements
 						OnMapClickListener,
 						OnClusterClickListener<WifiNetwork>,
-						OnClusterItemClickListener<WifiNetwork> {
+						OnClusterItemClickListener<WifiNetwork>, OnMarkerClickListener {
 		@Override
 		public void onMapClick(LatLng arg0) {
-			mSelectedNetwork = null;
+			onInfoWindowHide();
 		}
 		@Override
 		public boolean onClusterItemClick(WifiNetwork item) {
-			mSelectedNetwork = item;
+			onInfoWindowShow(item);
 			return false;
 		}
 		@Override
 		public boolean onClusterClick(Cluster<WifiNetwork> cluster) {
-			mSelectedNetwork = null;
+			onInfoWindowHide();
+			return false;
+		}		
+		@Override
+		public boolean onMarkerClick(Marker marker) {
+			mMarker = marker;
+			mClusterManager.onMarkerClick(marker);
 			return false;
 		}
 	}
@@ -101,7 +116,7 @@ public class GoogleMapManager {
         mClusterManager.setOnClusterItemClickListener(mSpecarator);
         mClusterManager.setOnClusterClickListener(mSpecarator);
         mMap.setOnCameraChangeListener(mClusterManager);
-        mMap.setOnMarkerClickListener(mClusterManager);
+        mMap.setOnMarkerClickListener(mSpecarator);
         mMap.setOnMapClickListener(mSpecarator);
 	}
 	
@@ -118,6 +133,7 @@ public class GoogleMapManager {
 	
 	public void moveCamera(LatLng position) {
 		mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(position, 18));
+		onInfoWindowHide();
 	}
 	
 	
@@ -128,5 +144,27 @@ public class GoogleMapManager {
 
 	public WifiNetwork getSelectedNetwork() {
 		return mSelectedNetwork;
+	}
+	
+	
+	public void onInfoWindowHide() {
+		mSelectedNetwork = null;
+		if (mCircle != null)
+			mCircle.remove();
+		if (mMarker != null)
+			mMarker.hideInfoWindow();
+	}
+	
+	
+	public void onInfoWindowShow(WifiNetwork item) {
+		mSelectedNetwork = item;
+		if (mCircle != null)
+			mCircle.remove();
+		mCircle = mMap.addCircle(new CircleOptions()
+							.center(item.getPosition())
+							.radius(item.getRange())
+							.fillColor(Color.argb(50, 0, 0, 255))
+							.strokeColor(Color.argb(127, 0, 0, 255))
+							.strokeWidth(2));
 	}
 }
