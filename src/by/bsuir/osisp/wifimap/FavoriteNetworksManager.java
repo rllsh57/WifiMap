@@ -1,13 +1,21 @@
 package by.bsuir.osisp.wifimap;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.List;
 
+import android.util.Log;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
 
 public class FavoriteNetworksManager {
+	
+	public static final String FAVORITE_STOREAGE_FILE = "/data/data/by.bsuir.osisp.wifimap/files/favorite";
 	
 	private ListView mDrawerList;
 	private List<WifiNetwork> mFavoriteList = new ArrayList<WifiNetwork>();
@@ -34,5 +42,28 @@ public class FavoriteNetworksManager {
 
 	public WifiNetwork getItem(int position) {
 		return mFavoriteAdapter.getItem(position);
+	}
+	
+	
+	public void save() {
+		try {
+			ObjectOutputStream stream = new ObjectOutputStream(new FileOutputStream(new File(FAVORITE_STOREAGE_FILE)));
+			stream.writeObject(mFavoriteList);
+			stream.close();
+		} catch (Exception e) {
+			Log.w(this.getClass().getSimpleName(), e.toString());
+		}
+	}
+	
+	
+	public void load() {
+		try {
+			ObjectInputStream stream = new ObjectInputStream(new FileInputStream(new File(FAVORITE_STOREAGE_FILE)));
+			mFavoriteList.clear();
+			mFavoriteAdapter.addAll((List<WifiNetwork>) stream.readObject());
+			stream.close();
+		} catch (Exception e) {
+			Log.w(this.getClass().getSimpleName(), e.toString());
+		}		
 	}
 }

@@ -1,5 +1,7 @@
 package by.bsuir.osisp.wifimap;
 
+import java.io.Serializable;
+
 import com.google.android.gms.maps.model.LatLng;
 import com.google.maps.android.clustering.ClusterItem;
 import com.j256.ormlite.field.DatabaseField;
@@ -7,8 +9,10 @@ import com.j256.ormlite.table.DatabaseTable;
 
 
 @DatabaseTable(tableName = "wm_access_points")
-public class WifiNetwork implements ClusterItem {
+public class WifiNetwork implements ClusterItem, Serializable {
 	
+	private static final long serialVersionUID = 2501569725623855689L;
+
 	@DatabaseField(generatedId=true)
 	private int ap_id;
 	@DatabaseField

@@ -102,8 +102,20 @@ public class MainActivity extends Activity implements
     	mFavNetManager = new FavoriteNetworksManager((ListView) findViewById(R.id.left_drawer), mMapManager);
     	
     	mDrawerList.setOnItemClickListener(this);
+
+		mFavNetManager.load();
+        mDbManager.connectToDatabase();
+        mDbManager.queryWifiNetworks();
+        mDbManager.disconnectFromDatabase();  
     }
-    
+
+	
+	@Override
+	protected void onDestroy() {
+		mFavNetManager.save();
+		super.onDestroy();
+	};
+	
     
     @Override
 	public boolean onCreateOptionsMenu(Menu menu) {
@@ -130,17 +142,6 @@ public class MainActivity extends Activity implements
         		WifiNetwork selectedNetwork = mMapManager.getSelectedNetwork();
         		if (selectedNetwork != null)
         			mFavNetManager.addNetwork(selectedNetwork);
-        		return true;
-        	case R.id.show_wifi:
-//        		List<WifiNetwork> nets = new ArrayList<WifiNetwork>();
-//        		nets.add(new WifiNetwork().setSsid("rllsh57").setLatLng(53.903137, 27.557007));
-//        		nets.add(new WifiNetwork().setSsid("ArtMaster").setLatLng(53.902671, 27.556845));
-//        		mFavNetManager.addNetwork(nets.get(0));
-//        		mFavNetManager.addNetwork(nets.get(1));
-//        		mMapManager.displayNetworks(nets);
-                mDbManager.connectToDatabase();
-                mDbManager.queryWifiNetworks();
-                mDbManager.disconnectFromDatabase();   
         		return true;
         	case R.id.settings:
         		Intent intent = new Intent(this, SettingsActivity.class);
