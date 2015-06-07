@@ -15,7 +15,7 @@ import android.widget.ListView;
 
 public class FavoriteNetworksManager {
 	
-	public static final String FAVORITE_STOREAGE_FILE = "/data/data/by.bsuir.osisp.wifimap/files/favorite";
+	public static final String FAVORITE_STORAGE_FILE = "/data/data/by.bsuir.osisp.wifimap/files/favorite";
 	
 	private ListView mDrawerList;
 	private List<WifiNetwork> mFavoriteList = new ArrayList<WifiNetwork>();
@@ -47,7 +47,7 @@ public class FavoriteNetworksManager {
 	
 	public void save() {
 		try {
-			ObjectOutputStream stream = new ObjectOutputStream(new FileOutputStream(new File(FAVORITE_STOREAGE_FILE)));
+			ObjectOutputStream stream = new ObjectOutputStream(new FileOutputStream(new File(FAVORITE_STORAGE_FILE)));
 			stream.writeObject(mFavoriteList);
 			stream.close();
 		} catch (Exception e) {
@@ -58,7 +58,7 @@ public class FavoriteNetworksManager {
 	
 	public void load() {
 		try {
-			ObjectInputStream stream = new ObjectInputStream(new FileInputStream(new File(FAVORITE_STOREAGE_FILE)));
+			ObjectInputStream stream = new ObjectInputStream(new FileInputStream(new File(FAVORITE_STORAGE_FILE)));
 			mFavoriteList.clear();
 			mFavoriteAdapter.addAll((List<WifiNetwork>) stream.readObject());
 			stream.close();
