@@ -1,8 +1,5 @@
 package by.bsuir.osisp.wifimap;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Intent;
@@ -23,7 +20,9 @@ import android.widget.Toast;
 
 
 @SuppressWarnings("deprecation")
-public class MainActivity extends Activity implements OnSharedPreferenceChangeListener, OnItemClickListener {
+public class MainActivity extends Activity implements 
+					OnSharedPreferenceChangeListener, 
+					OnItemClickListener {
 
 	public static MainActivity mInstance;
 	private SharedPreferences mSharedPrefences;
@@ -114,6 +113,12 @@ public class MainActivity extends Activity implements OnSharedPreferenceChangeLi
     }
     
     
+    @Override public boolean onPrepareOptionsMenu(Menu menu) {
+        menu.findItem(R.id.add_to_favorite).setVisible(mMapManager.isInfoWindowVisible());
+    	return super.onPrepareOptionsMenu(menu);
+    };
+    
+    
     @Override
 	public boolean onOptionsItemSelected(MenuItem item) {
         if (mDrawerToggle.onOptionsItemSelected(item)) {
@@ -121,16 +126,21 @@ public class MainActivity extends Activity implements OnSharedPreferenceChangeLi
         }
     	
         switch (item.getItemId()) {
+        	case R.id.add_to_favorite:
+        		WifiNetwork selectedNetwork = mMapManager.getSelectedNetwork();
+        		if (selectedNetwork != null)
+        			mFavNetManager.addNetwork(selectedNetwork);
+        		return true;
         	case R.id.show_wifi:
-        		List<WifiNetwork> nets = new ArrayList<WifiNetwork>();
-        		nets.add(new WifiNetwork().setSsid("rllsh57").setLatLng(53.903137, 27.557007));
-        		nets.add(new WifiNetwork().setSsid("ArtMaster").setLatLng(53.902671, 27.556845));
-        		mFavNetManager.addNetwork(nets.get(0));
-        		mFavNetManager.addNetwork(nets.get(1));
-        		mMapManager.displayNetworks(nets);
-//                mDbManager.connectToDatabase();
-//                mDbManager.queryWifiNetworks();
-//                mDbManager.disconnectFromDatabase();   
+//        		List<WifiNetwork> nets = new ArrayList<WifiNetwork>();
+//        		nets.add(new WifiNetwork().setSsid("rllsh57").setLatLng(53.903137, 27.557007));
+//        		nets.add(new WifiNetwork().setSsid("ArtMaster").setLatLng(53.902671, 27.556845));
+//        		mFavNetManager.addNetwork(nets.get(0));
+//        		mFavNetManager.addNetwork(nets.get(1));
+//        		mMapManager.displayNetworks(nets);
+                mDbManager.connectToDatabase();
+                mDbManager.queryWifiNetworks();
+                mDbManager.disconnectFromDatabase();   
         		return true;
         	case R.id.settings:
         		Intent intent = new Intent(this, SettingsActivity.class);

@@ -7,12 +7,19 @@ import android.content.Context;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.GoogleMap.OnInfoWindowClickListener;
+import com.google.android.gms.maps.GoogleMap.OnMapClickListener;
+import com.google.android.gms.maps.GoogleMap.OnMarkerClickListener;
 import com.google.android.gms.maps.MapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptor;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.maps.android.clustering.Cluster;
 import com.google.maps.android.clustering.ClusterManager;
+import com.google.maps.android.clustering.ClusterManager.OnClusterClickListener;
+import com.google.maps.android.clustering.ClusterManager.OnClusterItemClickListener;
 import com.google.maps.android.clustering.view.DefaultClusterRenderer;
 
 
@@ -20,8 +27,9 @@ public class GoogleMapManager {
 	
 	private GoogleMap mMap;
 	private ClusterManager<WifiNetwork> mClusterManager;
+	private WifiNetwork mSelectedNetwork;
+	private InfoWindowSpecarator mSpecarator = new InfoWindowSpecarator();
 
-	
 	private class WifiNetworkRenderer extends DefaultClusterRenderer<WifiNetwork> {
 
 		private final BitmapDescriptor mWifiOpenIcon = BitmapDescriptorFactory.fromResource(R.drawable.ic_wifi_signal_4_light);
@@ -40,7 +48,47 @@ public class GoogleMapManager {
             else 
            		markerOptions.icon(mWifiSecureIcon);            	
 		}
+		
+        @Override
+        protected boolean shouldRenderAsCluster(Cluster<WifiNetwork> cluster) {
+            // При перерисовке кластера, infoWindow закрывается. Сдесь отслеживается это.
+            boolean should = super.shouldRenderAsCluster(cluster);
+            if (cluster.getItems().contains((Object) mSelectedNetwork) && should)
+            	mSelectedNetwork = null;
+            return should;
+        }
 	};
+	
+	private class InfoWindowSpecarator implements
+						OnMapClickListener,
+						OnClusterClickListener<WifiNetwork>,
+						OnClusterItemClickListener<WifiNetwork> {
+		@Override
+		public void onMapClick(LatLng arg0) {
+			mSelectedNetwork = null;
+		}
+		@Override
+		public boolean onClusterItemClick(WifiNetwork item) {
+			mSelectedNetwork = item;
+			return false;
+		}
+		@Override
+		public boolean onClusterClick(Cluster<WifiNetwork> cluster) {
+			mSelectedNetwork = null;
+			return false;
+		}
+	}
+	
+	
+	private void displayNetworksOnMap(List<WifiNetwork> networks) {
+		if (networks == null)
+			return;
+		mClusterManager.clearItems();
+		for (WifiNetwork network: networks) {
+			mClusterManager.addItem(network);
+		}
+		mClusterManager.cluster();
+	}
 	
 	
 	public GoogleMapManager(Activity activity) {
@@ -53,18 +101,11 @@ public class GoogleMapManager {
 
         mClusterManager = new ClusterManager<WifiNetwork>(activity, mMap);
         mClusterManager.setRenderer(new WifiNetworkRenderer(activity, mMap, mClusterManager));
+        mClusterManager.setOnClusterItemClickListener(mSpecarator);
+        mClusterManager.setOnClusterClickListener(mSpecarator);
         mMap.setOnCameraChangeListener(mClusterManager);
-	}
-	
-	
-	private void displayNetworksOnMap(List<WifiNetwork> networks) {
-		if (networks == null)
-			return;
-		mClusterManager.clearItems();
-		for (WifiNetwork network: networks) {
-			mClusterManager.addItem(network);
-		}
-		mClusterManager.cluster();
+        mMap.setOnMarkerClickListener(mClusterManager);
+        mMap.setOnMapClickListener(mSpecarator);
 	}
 	
 	
@@ -80,5 +121,15 @@ public class GoogleMapManager {
 	
 	public void moveCamera(LatLng position) {
 		mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(position, 18));
+	}
+	
+	
+	public boolean isInfoWindowVisible() {
+		return mSelectedNetwork != null;
+	}
+
+
+	public WifiNetwork getSelectedNetwork() {
+		return mSelectedNetwork;
 	}
 }
