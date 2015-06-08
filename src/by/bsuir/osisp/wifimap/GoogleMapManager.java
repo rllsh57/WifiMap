@@ -8,11 +8,13 @@ import android.graphics.Color;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.GoogleMap.OnCameraChangeListener;
 import com.google.android.gms.maps.GoogleMap.OnMapClickListener;
 import com.google.android.gms.maps.GoogleMap.OnMarkerClickListener;
 import com.google.android.gms.maps.MapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptor;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
+import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.Circle;
 import com.google.android.gms.maps.model.CircleOptions;
 import com.google.android.gms.maps.model.LatLng;
@@ -30,6 +32,7 @@ public class GoogleMapManager {
 	private GoogleMap mMap;
 	private ClusterManager<WifiNetwork> mClusterManager;
 	private InfoWindowSpecarator mSpecarator = new InfoWindowSpecarator();
+	private WifiDatabaseManager mDbManager;
 
 	private WifiNetwork mSelectedNetwork;
 	private Circle mCircle;
@@ -67,8 +70,11 @@ public class GoogleMapManager {
 	
 	private class InfoWindowSpecarator implements
 						OnMapClickListener,
+						OnMarkerClickListener,
+						OnCameraChangeListener,
 						OnClusterClickListener<WifiNetwork>,
-						OnClusterItemClickListener<WifiNetwork>, OnMarkerClickListener {
+						OnClusterItemClickListener<WifiNetwork>
+{
 		@Override
 		public void onMapClick(LatLng arg0) {
 			onInfoWindowHide();
@@ -88,6 +94,16 @@ public class GoogleMapManager {
 			mMarker = marker;
 			mClusterManager.onMarkerClick(marker);
 			return false;
+		}
+		@Override
+		public void onCameraChange(CameraPosition position) {
+			if (position.zoom < 14) {
+				mClusterManager.clearItems();
+			}
+			else {
+				mDbManager.queryRegion(mMap.getProjection().getVisibleRegion());
+			}
+			mClusterManager.onCameraChange(position);
 		}
 	}
 	
@@ -115,9 +131,14 @@ public class GoogleMapManager {
         mClusterManager.setRenderer(new WifiNetworkRenderer(activity, mMap, mClusterManager));
         mClusterManager.setOnClusterItemClickListener(mSpecarator);
         mClusterManager.setOnClusterClickListener(mSpecarator);
-        mMap.setOnCameraChangeListener(mClusterManager);
+        mMap.setOnCameraChangeListener(mSpecarator);
         mMap.setOnMarkerClickListener(mSpecarator);
         mMap.setOnMapClickListener(mSpecarator);
+	}
+	
+	
+	public void setWifiDatabaseManager(WifiDatabaseManager manager) {
+		mDbManager = manager;
 	}
 	
 	

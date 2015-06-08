@@ -101,6 +101,7 @@ public class MainActivity extends Activity implements
 
     	mMapManager = new GoogleMapManager(this);
     	mDbManager = new WifiDatabaseManager(mMapManager);
+    	mMapManager.setWifiDatabaseManager(mDbManager);
     	mFavNetManager = new FavoriteNetworksManager((ListView) findViewById(R.id.left_drawer), mMapManager);
     	
     	mDrawerList.setOnItemClickListener(this);
@@ -108,7 +109,6 @@ public class MainActivity extends Activity implements
 
 		mFavNetManager.load();
 		mDbManager.importRemote();
-		mDbManager.queryLocal();
     }
 
 	
