@@ -19,7 +19,7 @@ public class SettingsActivity extends PreferenceActivity implements OnSharedPref
     	mSharedPrefences = PreferenceManager.getDefaultSharedPreferences(this);
     	mSharedPrefences.registerOnSharedPreferenceChangeListener(this);
 
-    	setTheme(Integer.valueOf(mSharedPrefences.getString(KEY_PREF_THEME, "")));
+    	setTheme(Integer.valueOf(mSharedPrefences.getString(KEY_PREF_THEME, "16973931")));
     	
     	super.onCreate(savedInstanceState);
     	addPreferencesFromResource(R.xml.preferences);

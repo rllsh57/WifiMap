@@ -1,6 +1,6 @@
 package by.bsuir.osisp.wifimap;
 
-import java.sql.SQLException;
+import java.io.File;
 import java.util.List;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
@@ -20,6 +20,8 @@ public class WifiDatabaseManager {
 	
 	private static final String DATABASE_LOGIN = "rllsh57";
 	private static final String DATABASE_PASS = "107295";
+	private static final String SQLITE_DATABASE_DIR = "/data/data/by.bsuir.osisp.wifimap/databases/";
+	private static final String SQLITE_DATABASE_FILE = "wifi_map.db";
 	
 	private ConnectionSource mLocalSource;
 	private ConnectionSource mRemoteSource;
@@ -31,7 +33,9 @@ public class WifiDatabaseManager {
 	private Runnable mQueryLocal = new ExceptionSafeTask() {		
 		@Override
 		protected void task() throws Exception {
-			mLocalSource = new AndroidConnectionSource(SQLiteDatabase.openOrCreateDatabase("/data/data/by.bsuir.osisp.wifimap/databases/wifi_map.db", null));
+			File dir = new File(SQLITE_DATABASE_DIR);
+			dir.mkdirs();
+			mLocalSource = new AndroidConnectionSource(SQLiteDatabase.openOrCreateDatabase(SQLITE_DATABASE_DIR + SQLITE_DATABASE_FILE, null));
 			mLocalDao = DaoManager.createDao(mLocalSource, WifiNetwork.class);
 			
 			List<WifiNetwork> networks = mLocalDao.queryForAll();
@@ -61,11 +65,13 @@ public class WifiDatabaseManager {
 	private Runnable mImportRemote = new ExceptionSafeTask() {
 		@Override
 		protected void task() throws Exception {
-			mLocalSource = new AndroidConnectionSource(SQLiteDatabase.openOrCreateDatabase("/data/data/by.bsuir.osisp.wifimap/databases/wifi_map.db", null));
+			File dir = new File(SQLITE_DATABASE_DIR);
+			dir.mkdirs();
+			mLocalSource = new AndroidConnectionSource(SQLiteDatabase.openOrCreateDatabase(SQLITE_DATABASE_DIR + SQLITE_DATABASE_FILE, null));
 			mLocalDao = DaoManager.createDao(mLocalSource, WifiNetwork.class);
 			
 			String url = "jdbc:mysql://"
-					+ "192.168.100.3:3306"
+					+ MainActivity.mSharedPrefences.getString(SettingsActivity.KEY_PREF_DATABASE_SERVER, "")
 					+ "/test_wifi_map";
 			mRemoteSource = new JdbcConnectionSource(url, DATABASE_LOGIN, DATABASE_PASS);
 			mRemoteDao = DaoManager.createDao(mRemoteSource, WifiNetwork.class);
@@ -73,7 +79,7 @@ public class WifiDatabaseManager {
 			try {
 				TableUtils.createTable(mLocalSource, WifiNetwork.class);
 			}
-			catch (SQLException e) {
+			catch (Exception e) {
 				Log.w(this.getClass().getSimpleName(), e.toString());
 			}
 

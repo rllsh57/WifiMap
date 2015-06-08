@@ -27,7 +27,7 @@ public class MainActivity extends Activity implements
 					OnItemLongClickListener {
 
 	public static MainActivity mInstance;
-	private SharedPreferences mSharedPrefences;
+	public static SharedPreferences mSharedPrefences;
 	
 	private DrawerLayout mDrawerLayout;
 	private ListView mDrawerList;
