@@ -96,7 +96,7 @@ public class MainActivity extends Activity implements
     	mSharedPrefences.registerOnSharedPreferenceChangeListener(this);
 
     	super.onCreate(savedInstanceState);
-		setActivityTheme(Integer.valueOf(mSharedPrefences.getString(SettingsActivity.KEY_PREF_THEME, "")));
+		setActivityTheme(Integer.valueOf(mSharedPrefences.getString(SettingsActivity.KEY_PREF_THEME, "16973931")));
 		setupFavoritesDrawer();
 
     	mMapManager = new GoogleMapManager(this);
@@ -107,9 +107,8 @@ public class MainActivity extends Activity implements
     	mDrawerList.setOnItemLongClickListener(this);
 
 		mFavNetManager.load();
-        mDbManager.connectToDatabase();
-        mDbManager.queryWifiNetworks();
-        mDbManager.disconnectFromDatabase();  
+		mDbManager.importRemote();
+		mDbManager.queryLocal();
     }
 
 	

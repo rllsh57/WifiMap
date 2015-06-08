@@ -17,7 +17,7 @@ public class WifiNetwork implements ClusterItem, Serializable {
 	
 	private static final long serialVersionUID = 2501569725623855689L;
 
-	@DatabaseField(generatedId=true)
+	@DatabaseField(id=true)
 	private int ap_id;
 	@DatabaseField
 	private String ap_ssid;
