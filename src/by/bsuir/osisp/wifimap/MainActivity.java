@@ -107,9 +107,9 @@ public class MainActivity extends Activity implements
     	mDrawerList.setOnItemLongClickListener(this);
 
 		mFavNetManager.load();
-		mDbManager.importRemote();
 		mDbManager.queryLocal();
-    }
+		mDbManager.importRemote();
+	}
 
 	
 	@Override
