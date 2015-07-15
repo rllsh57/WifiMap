@@ -63,7 +63,7 @@ public class GoogleMapManager {
             	onInfoWindowHide();
             return should;
         }
-	};
+	}
 	
 	private class InfoWindowSpecarator implements
 						OnMapClickListener,
@@ -105,7 +105,7 @@ public class GoogleMapManager {
 	
 	public GoogleMapManager(Activity activity) {
 		MapFragment mapFragment = (MapFragment) activity.getFragmentManager().findFragmentById(R.id.map);
-		
+
 		mMap = mapFragment.getMap();
         mMap.setMyLocationEnabled(true);
         mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(

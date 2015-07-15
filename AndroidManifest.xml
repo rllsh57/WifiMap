@@ -24,11 +24,12 @@
     <application
         android:allowBackup="true"
         android:label="@string/app_name"
-        android:theme="@android:style/Theme.DeviceDefault" android:icon="@drawable/ic_settings_wifi">
+        android:theme="@android:style/Theme.DeviceDefault"
+        android:icon="@drawable/ic_settings_wifi">
         
         <meta-data
             android:name="com.google.android.maps.v2.API_KEY"
-            android:value="AIzaSyBkl8Fz73zciEXfq2g0GwG-tWZ7PVQHCPo" />
+            android:value="AIzaSyDjAUnU0vlvFNkPiB5hjQyBDIUdzASjjl0" />
         
         <activity
             android:name=".MainActivity"

@@ -1,15 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
-    <EditTextPreference 
+    <EditTextPreference
+        android:defaultValue="192.168.100.2:3306"
         android:key="pref_db_server"
-        android:title="@string/database_server"
         android:summary="@string/database_server_summary"
-        android:defaultValue="192.168.100.2:3306" />
-      <ListPreference
-        android:key="pref_theme"
-        android:title="@string/theme"
-        android:summary="@string/theme_summary" 
-        android:entries="@array/theme_entries" 
+        android:title="@string/database_server" />
+    <ListPreference
+        android:entries="@array/theme_entries"
         android:entryValues="@array/theme_values"
-        android:defaultValue="16974120" /> 
+        android:key="pref_theme"
+        android:summary="@string/theme_summary"
+        android:title="@string/theme"
+        android:defaultValue="16974120"/>
 </PreferenceScreen>

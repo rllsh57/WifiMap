@@ -1,10 +1,12 @@
 package by.bsuir.osisp.wifimap;
 
 import android.annotation.SuppressLint;
+import android.app.ActionBar;
 import android.app.Activity;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
+import android.content.res.Resources;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v4.app.ActionBarDrawerToggle;
@@ -20,15 +22,14 @@ import android.widget.ListView;
 import android.widget.Toast;
 
 
-@SuppressWarnings("deprecation")
-public class MainActivity extends Activity implements 
+public class MainActivity extends Activity implements
 					OnSharedPreferenceChangeListener, 
 					OnItemClickListener,
 					OnItemLongClickListener {
 
 	public static MainActivity mInstance;
 	public static SharedPreferences mSharedPrefences;
-	
+
 	private DrawerLayout mDrawerLayout;
 	private ListView mDrawerList;
 	private ActionBarDrawerToggle mDrawerToggle;
@@ -60,34 +61,26 @@ public class MainActivity extends Activity implements
 	}
 	
 	
-	public void setActivityTheme(int resid) {
-		// Тема должна быть установлена до setContentView() иначе установится плохо
-		setTheme(resid);
-		setContentView(R.layout.activity_main);
-		// findViewById() должен быть вызван после setContentView() иначе NullPointerException
-		ListView mDrawerList = (ListView) findViewById(R.id.left_drawer);
-		if (resid == android.R.style.Theme_Holo_Light)
-			mDrawerList.setBackgroundResource(R.drawable.background_holo_light);
-		else if (resid == android.R.style.Theme_Holo)
-			mDrawerList.setBackgroundResource(R.drawable.background_holo_dark);	
-	}
-	
-	
 	protected void setupFavoritesDrawer() {	
 		mDrawerList = (ListView) findViewById(R.id.left_drawer);
-		mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);		
+		mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
+
+        mDrawerList.setOnItemClickListener(this);
+        mDrawerList.setOnItemLongClickListener(this);
+
         getActionBar().setDisplayHomeAsUpEnabled(true);
         getActionBar().setTitle(R.string.favorite);
+
         mDrawerToggle = new ActionBarDrawerToggle(
 				this,
 				mDrawerLayout,
 				R.drawable.ic_drawer,
 				R.string.favorite,
 				R.string.favorite);
-	}
+        mDrawerLayout.setDrawerListener(mDrawerToggle);
+    }
 	
-	
-	@SuppressLint("NewApi")
+
 	@Override
     public void onCreate(Bundle savedInstanceState) {
     	mInstance = this;
@@ -95,28 +88,35 @@ public class MainActivity extends Activity implements
     	mSharedPrefences = PreferenceManager.getDefaultSharedPreferences(this);
     	mSharedPrefences.registerOnSharedPreferenceChangeListener(this);
 
-    	super.onCreate(savedInstanceState);
-		setActivityTheme(Integer.valueOf(mSharedPrefences.getString(SettingsActivity.KEY_PREF_THEME, "16973931")));
-		setupFavoritesDrawer();
+		super.onCreate(savedInstanceState);
+        setTheme(Integer.valueOf(mSharedPrefences.getString(
+                SettingsActivity.KEY_PREF_THEME,
+                String.valueOf(android.R.style.Theme_DeviceDefault))));
+        setContentView(R.layout.activity_main);
+        setupFavoritesDrawer();
 
     	mMapManager = new GoogleMapManager(this);
     	mDbManager = new WifiDatabaseManager(mMapManager);
-    	mFavNetManager = new FavoriteNetworksManager((ListView) findViewById(R.id.left_drawer), mMapManager);
-    	
-    	mDrawerList.setOnItemClickListener(this);
-    	mDrawerList.setOnItemLongClickListener(this);
+    	mFavNetManager = new FavoriteNetworksManager(mDrawerList, mMapManager);
 
 		mFavNetManager.load();
 		mDbManager.queryLocal();
 		mDbManager.importRemote();
 	}
 
+
+    @Override
+    protected void onPostCreate(Bundle savedInstanceState) {
+        super.onPostCreate(savedInstanceState);
+        mDrawerToggle.syncState();
+    }
+
 	
 	@Override
 	protected void onDestroy() {
 		mFavNetManager.save();
 		super.onDestroy();
-	};
+	}
 	
     
     @Override
@@ -131,7 +131,7 @@ public class MainActivity extends Activity implements
         menu.findItem(R.id.add_to_favorite).setVisible(mMapManager.isInfoWindowVisible());
         menu.findItem(R.id.connect_to).setVisible(mMapManager.isInfoWindowVisible());
     	return super.onPrepareOptionsMenu(menu);
-    };
+    }
     
     
     @Override
