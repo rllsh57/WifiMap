@@ -1,5 +1,9 @@
 package by.bsuir.osisp.wifimap;
 
+import android.util.Log;
+import android.widget.ArrayAdapter;
+import android.widget.ListView;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -7,10 +11,6 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.List;
-
-import android.util.Log;
-import android.widget.ArrayAdapter;
-import android.widget.ListView;
 
 
 public class FavoriteNetworksManager {
@@ -60,7 +60,8 @@ public class FavoriteNetworksManager {
 		try {
 			ObjectInputStream stream = new ObjectInputStream(new FileInputStream(new File(FAVORITE_STORAGE_FILE)));
 			mFavoriteList.clear();
-			mFavoriteAdapter.addAll((List<WifiNetwork>) stream.readObject());
+			for (WifiNetwork network: (List<WifiNetwork>) stream.readObject())
+				mFavoriteAdapter.add(network);
 			stream.close();
 		} catch (Exception e) {
 			Log.w(this.getClass().getSimpleName(), e.toString());

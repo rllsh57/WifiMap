@@ -1,16 +1,16 @@
 package by.bsuir.osisp.wifimap;
 
-import android.annotation.SuppressLint;
 import android.app.ActionBar;
-import android.app.Activity;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
-import android.content.res.Resources;
+import android.content.res.Configuration;
+import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
-import android.support.v4.app.ActionBarDrawerToggle;
+import android.support.v4.app.FragmentActivity;
 import android.support.v4.widget.DrawerLayout;
+import android.support.v7.app.ActionBarDrawerToggle;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -22,7 +22,7 @@ import android.widget.ListView;
 import android.widget.Toast;
 
 
-public class MainActivity extends Activity implements
+public class MainActivity extends FragmentActivity implements
 					OnSharedPreferenceChangeListener, 
 					OnItemClickListener,
 					OnItemLongClickListener {
@@ -30,6 +30,7 @@ public class MainActivity extends Activity implements
 	public static MainActivity mInstance;
 	public static SharedPreferences mSharedPrefences;
 
+    private ActionBar mActionBar;
 	private DrawerLayout mDrawerLayout;
 	private ListView mDrawerList;
 	private ActionBarDrawerToggle mDrawerToggle;
@@ -53,12 +54,21 @@ public class MainActivity extends Activity implements
 		mInstance.runOnUiThread(task);
 	}
 
+
+    @Override
+    public void recreate() {
+        if (Build.VERSION.SDK_INT >= 11) {
+            super.recreate();
+        }
+    }
+
 	
 	@Override
 	public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
-		if (key.equals(SettingsActivity.KEY_PREF_THEME))
-			recreate();
-	}
+		if (key.equals(SettingsActivity.KEY_PREF_THEME)) {
+            recreate();
+		}
+    }
 	
 	
 	protected void setupFavoritesDrawer() {	
@@ -68,17 +78,24 @@ public class MainActivity extends Activity implements
         mDrawerList.setOnItemClickListener(this);
         mDrawerList.setOnItemLongClickListener(this);
 
-        getActionBar().setDisplayHomeAsUpEnabled(true);
-        getActionBar().setTitle(R.string.favorite);
-
         mDrawerToggle = new ActionBarDrawerToggle(
 				this,
 				mDrawerLayout,
-				R.drawable.ic_drawer,
 				R.string.favorite,
-				R.string.favorite);
+				R.string.favorite) {
+            @Override
+            public void onDrawerSlide(View view, float offset) {
+				supportInvalidateOptionsMenu();
+            }
+        };
         mDrawerLayout.setDrawerListener(mDrawerToggle);
-    }
+
+        if (Build.VERSION.SDK_INT >= 14) {
+            mActionBar = getActionBar();
+            mActionBar.setDisplayHomeAsUpEnabled(true);
+            mActionBar.setTitle(R.string.favorite);
+        }
+	}
 	
 
 	@Override
@@ -88,20 +105,20 @@ public class MainActivity extends Activity implements
     	mSharedPrefences = PreferenceManager.getDefaultSharedPreferences(this);
     	mSharedPrefences.registerOnSharedPreferenceChangeListener(this);
 
-		super.onCreate(savedInstanceState);
+        super.onCreate(savedInstanceState);
         setTheme(Integer.valueOf(mSharedPrefences.getString(
                 SettingsActivity.KEY_PREF_THEME,
-                String.valueOf(android.R.style.Theme_DeviceDefault))));
+                String.valueOf(R.style.AppTheme))));
         setContentView(R.layout.activity_main);
         setupFavoritesDrawer();
 
-    	mMapManager = new GoogleMapManager(this);
-    	mDbManager = new WifiDatabaseManager(mMapManager);
-    	mFavNetManager = new FavoriteNetworksManager(mDrawerList, mMapManager);
+        mMapManager = new GoogleMapManager(this);
+        mDbManager = new WifiDatabaseManager(mMapManager);
+        mFavNetManager = new FavoriteNetworksManager(mDrawerList, mMapManager);
 
-		mFavNetManager.load();
-		mDbManager.queryLocal();
-		mDbManager.importRemote();
+        mFavNetManager.load();
+        mDbManager.queryLocal();
+        mDbManager.importRemote();
 	}
 
 
@@ -109,6 +126,16 @@ public class MainActivity extends Activity implements
     protected void onPostCreate(Bundle savedInstanceState) {
         super.onPostCreate(savedInstanceState);
         mDrawerToggle.syncState();
+
+        if ((Build.VERSION.SDK_INT >= 14) && (Build.VERSION.SDK_INT <= 20))
+            mActionBar.setHomeAsUpIndicator(R.drawable.ic_drawer);
+	}
+
+
+    @Override
+    public void onConfigurationChanged(Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
+        mDrawerToggle.onConfigurationChanged(newConfig);
     }
 
 	

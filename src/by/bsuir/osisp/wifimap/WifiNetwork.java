@@ -1,7 +1,5 @@
 package by.bsuir.osisp.wifimap;
 
-import java.io.Serializable;
-
 import android.content.Context;
 import android.net.wifi.WifiConfiguration;
 import android.net.wifi.WifiManager;
@@ -10,6 +8,8 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.maps.android.clustering.ClusterItem;
 import com.j256.ormlite.field.DatabaseField;
 import com.j256.ormlite.table.DatabaseTable;
+
+import java.io.Serializable;
 
 
 @DatabaseTable(tableName = "wm_access_points")

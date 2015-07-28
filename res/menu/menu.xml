@@ -1,6 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
-<menu xmlns:android="http://schemas.android.com/apk/res/android" >
-    <item android:id="@+id/add_to_favorite" android:title="@string/add_to_favorite" android:visible="false"/>
-    <item android:id="@+id/connect_to" android:title="@string/connect" android:visible="false"/>
-    <item android:id="@+id/settings" android:title="@string/settings"/>    
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/add_to_favorite"
+        android:title="@string/add_to_favorite"
+        android:icon="@android:drawable/ic_menu_add" />
+    <item
+        android:id="@+id/connect_to"
+        android:title="@string/connect"
+        android:icon="@android:drawable/ic_menu_set_as" />
+    <item
+        android:id="@+id/settings"
+        android:title="@string/settings"
+        android:icon="@android:drawable/ic_menu_preferences" />
 </menu>

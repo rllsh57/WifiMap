@@ -2,6 +2,7 @@ package by.bsuir.osisp.wifimap;
 
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
+import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceActivity;
 import android.preference.PreferenceManager;
@@ -21,7 +22,7 @@ public class SettingsActivity extends PreferenceActivity implements OnSharedPref
 
     	setTheme(Integer.valueOf(mSharedPrefences.getString(
 				KEY_PREF_THEME,
-				String.valueOf(android.R.style.Theme_DeviceDefault))));
+				String.valueOf(R.style.AppTheme_Light))));
 
     	super.onCreate(savedInstanceState);
     	addPreferencesFromResource(R.xml.preferences);
@@ -30,7 +31,16 @@ public class SettingsActivity extends PreferenceActivity implements OnSharedPref
 
 	@Override
 	public void onSharedPreferenceChanged(SharedPreferences preferences, String key) {
-		if (key.equals(SettingsActivity.KEY_PREF_THEME))
-			recreate();
+		if (key.equals(SettingsActivity.KEY_PREF_THEME)) {
+            recreate();
+        }
 	}
+
+
+    @Override
+    public void recreate() {
+        if (Build.VERSION.SDK_INT >= 11) {
+            super.recreate();
+        }
+    }
 }

@@ -1,8 +1,5 @@
 package by.bsuir.osisp.wifimap;
 
-import java.util.List;
-
-import android.app.Activity;
 import android.content.Context;
 import android.graphics.Color;
 
@@ -10,7 +7,7 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.GoogleMap.OnMapClickListener;
 import com.google.android.gms.maps.GoogleMap.OnMarkerClickListener;
-import com.google.android.gms.maps.MapFragment;
+import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptor;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.Circle;
@@ -23,6 +20,8 @@ import com.google.maps.android.clustering.ClusterManager;
 import com.google.maps.android.clustering.ClusterManager.OnClusterClickListener;
 import com.google.maps.android.clustering.ClusterManager.OnClusterItemClickListener;
 import com.google.maps.android.clustering.view.DefaultClusterRenderer;
+
+import java.util.List;
 
 
 public class GoogleMapManager {
@@ -103,8 +102,10 @@ public class GoogleMapManager {
 	}
 	
 	
-	public GoogleMapManager(Activity activity) {
-		MapFragment mapFragment = (MapFragment) activity.getFragmentManager().findFragmentById(R.id.map);
+	public GoogleMapManager(MainActivity activity) {
+		SupportMapFragment mapFragment = (SupportMapFragment) activity
+                .getSupportFragmentManager()
+				.findFragmentById(R.id.map);
 
 		mMap = mapFragment.getMap();
         mMap.setMyLocationEnabled(true);

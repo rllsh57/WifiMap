@@ -1,10 +1,5 @@
 package by.bsuir.osisp.wifimap;
 
-import java.io.File;
-import java.util.List;
-import java.util.concurrent.Executor;
-import java.util.concurrent.Executors;
-
 import android.database.sqlite.SQLiteDatabase;
 import android.util.Log;
 
@@ -14,6 +9,11 @@ import com.j256.ormlite.dao.DaoManager;
 import com.j256.ormlite.jdbc.JdbcConnectionSource;
 import com.j256.ormlite.support.ConnectionSource;
 import com.j256.ormlite.table.TableUtils;
+
+import java.io.File;
+import java.util.List;
+import java.util.concurrent.Executor;
+import java.util.concurrent.Executors;
 
 
 public class WifiDatabaseManager {

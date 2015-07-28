@@ -9,15 +9,15 @@
     <string name="add_to_favorite">Add to Favorite</string>
     <string name="connect">Connect</string>
     <string name="settings">Settings</string>
-    
+
     <string-array name="theme_entries">
         <item>Dark</item>
         <item>Light</item>
     </string-array>
 
     <string-array name="theme_values">
-        <item>16974120</item>
-        <item>16974123</item>
+        <item>2131493175</item>
+        <item>2131493176</item>
     </string-array>
 
 </resources>
