@@ -86,6 +86,7 @@ public class MainActivity extends FragmentActivity implements
             @Override
             public void onDrawerSlide(View view, float offset) {
 				supportInvalidateOptionsMenu();
+				super.onDrawerSlide(view, offset);
             }
         };
         mDrawerLayout.setDrawerListener(mDrawerToggle);

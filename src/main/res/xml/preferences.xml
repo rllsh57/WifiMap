@@ -13,6 +13,6 @@
         android:key="pref_theme"
         android:summary="@string/theme_summary"
         android:title="@string/theme"
-        android:defaultValue="2131493175" />
+        android:defaultValue="2131230744" />
 
 </PreferenceScreen>
